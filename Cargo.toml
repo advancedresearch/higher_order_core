@@ -3,6 +3,13 @@ name = "advancedresearch-higher_order_core"
 version = "0.1.0"
 authors = ["Sven Nilsen <bvssvni@gmail.com>"]
 edition = "2018"
+keywords = ["advancedresearch", "higher", "order", "core"]
+description = "Core structs and traits for programming with higher order structures in Rust"
+license = "MIT"
+repository = "https://github.com/advancedresearch/higher_order_core.git"
+homepage = "https://github.com/advancedresearch/higher_order_core"
+documentation = "advancedresearch-higher_order_core"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
