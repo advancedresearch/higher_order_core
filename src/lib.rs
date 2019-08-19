@@ -15,7 +15,7 @@
 //!
 //! In a higher order data structure, data and functions become the same thing.
 //!
-//! The central idea of an higher order data structure,
+//! The central idea of a higher order data structure,
 //! is that properties can be functions of the same type.
 //!
 //! For example, a `Point` has an `x`, `y` and `z` property.
@@ -35,12 +35,12 @@
 //!
 //! The major application of higher order data structures is geometry.
 //!
-//! An typical usage is e.g. to create procedurally generated content for games.
+//! A typical usage is e.g. to create procedurally generated content for games.
 //!
 //! Higher order data structures is about finding the right balance between
 //! hiding implementation details and exposing them for various generic algorithms.
 //!
-//! For example, a unit circle can be thought of as having the type `Point<f64>`.
+//! For example, a circle can be thought of as having the type `Point<f64>`.
 //! The argument can be an angle in radians, or a value in the unit interval `[0, 1]`.
 //!
 //! Another example, a line can be thought of as having the type `Point<f64>`.
@@ -56,7 +56,7 @@
 //!
 //! For example, an animated point can be thought of as having the type `Point<(&[Frame], f64)>`.
 //! The first argument contains the animation data and the second argument is time in seconds.
-//! Properties `x`, `y` and `z` of an animated point determines how the animated time is computed.
+//! Properties `x`, `y` and `z` of an animated point determines how the animated point is computed.
 //! The details of the implementation can be hidden from the algorithm that uses animated points.
 //!
 //! Sometimes you need to work with complex geometry.
