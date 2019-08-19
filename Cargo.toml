@@ -1,6 +1,6 @@
 [package]
 name = "advancedresearch-higher_order_core"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Sven Nilsen <bvssvni@gmail.com>"]
 edition = "2018"
 keywords = ["advancedresearch", "higher", "order", "core"]
