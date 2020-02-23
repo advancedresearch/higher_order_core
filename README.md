@@ -72,25 +72,25 @@ under various reference frames.
 Here is an example of how to declare a new higher order data structure:
 
 ```rust
-use higher_order_core::{Ho, Call, Arg, Func};
+use higher_order_core::{Ho, Call, Arg, Fun, Func};
 use std::sync::Arc;
 
 /// Higher order 3D point.
 #[derive(Clone)]
 pub struct Point<T = ()> where f64: Ho<T> {
     /// Function for x-coordinates.
-    pub x: <f64 as Ho<T>>::Fun,
+    pub x: Fun<T, f64>,
     /// Function for y-coordinates.
-    pub y: <f64 as Ho<T>>::Fun,
+    pub y: Fun<T, f64>,
     /// Function for z-coordinates.
-    pub z: <f64 as Ho<T>>::Fun,
+    pub z: Fun<T, f64>,
 }
 
 // It is common to declare a type alias for functions, e.g:
 pub type PointFunc<T> = Point<Arg<T>>;
 
 // Implement `Ho<Arg<T>>` to allow higher order data structures
-// using properties `<Point as Ho<T>>::Fun`.
+// using properties `Fun<T, Point>` (`<Point as Ho<T>>::Fun`).
 impl<T: Clone> Ho<Arg<T>> for Point {
    type Fun = PointFunc<T>;
 }
