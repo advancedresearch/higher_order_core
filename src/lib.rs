@@ -167,6 +167,45 @@
 //!
 //! - Once for the ordinary case `X<()>`
 //! - Once for the higher order case `X<Arg<T>>`
+//!
+//! ### Higher Order Maps
+//!
+//! Sometimes it is useful to construct arbitrary data of the kind:
+//!
+//! - Vectors of primitives
+//! - Vectors of vectors, etc.
+//!
+//! For example, if a higher order point maps from angles to a circle,
+//! then complex geometry primitives might be defined onto the circle using angles:
+//!
+//! - Edge, e.g. `[a, b]`
+//! - Triangle, e.g. `[a, b, c]`
+//! - Square, e.g. `[[a, b], [c, d]]`
+//!
+//! The `HMap::hmap` method can be used to work with such structures.
+//!
+//! For example, if `p` is a higher order point of type `Point<Arg<f64>>`,
+//! then the following code maps two points at the same time:
+//!
+//! ```ignore
+//! let q: [Point; 2] = [0.0, 1.0].hmap(&p);
+//! ```
+//!
+//! For binary higher order maps of type `f : (T, T) -> U`,
+//! the `HPair::hpair` method can be used before using `HMap::hmap`.
+//!
+//! For example:
+//!
+//! ```ignore
+//! let in_between: Func<f64, f64> = Arc::new(move |(a, b)| {
+//!     if b < a {b += 1.0};
+//!     (a + (b - a) * 0.5) % 1.0
+//! });
+//! // Pair up.
+//! let args: [(f64, f64); 2] = ([0.7, 0.9], [0.9, 0.1]).hpair();
+//! // `[0.8, 0.0]`
+//! let q: [f64; 2] = args.hmap(&in_between);
+//! ```
 
 use std::sync::Arc;
 
@@ -219,3 +258,162 @@ impl<T> Ho<Arg<T>> for i16 {type Fun = Func<T, i16>;}
 impl<T> Ho<Arg<T>> for i32 {type Fun = Func<T, i32>;}
 impl<T> Ho<Arg<T>> for i64 {type Fun = Func<T, i64>;}
 impl<T> Ho<Arg<T>> for isize {type Fun = Func<T, isize>;}
+
+/// Higher order pairing.
+///
+/// A higher order pairing is used pair up components of a pair of data structures.
+/// This is used before binary higher order maps of the type `f : (T, T) -> U`.
+pub trait HPair {
+    /// Output type.
+    type Out;
+    /// Returns the higher order transposed value.
+    fn hpair(self) -> Self::Out;
+}
+
+impl HPair for (f64, f64) {type Out = Self; fn hpair(self) -> Self {self}}
+impl HPair for (f32, f32) {type Out = Self; fn hpair(self) -> Self {self}}
+impl HPair for (u8, u8) {type Out = Self; fn hpair(self) -> Self {self}}
+impl HPair for (u16, u16) {type Out = Self; fn hpair(self) -> Self {self}}
+impl HPair for (u32, u32) {type Out = Self; fn hpair(self) -> Self {self}}
+impl HPair for (u64, u64) {type Out = Self; fn hpair(self) -> Self {self}}
+impl HPair for (usize, usize) {type Out = Self; fn hpair(self) -> Self {self}}
+impl HPair for (i8, i8) {type Out = Self; fn hpair(self) -> Self {self}}
+impl HPair for (i16, i16) {type Out = Self; fn hpair(self) -> Self {self}}
+impl HPair for (i32, i32) {type Out = Self; fn hpair(self) -> Self {self}}
+impl HPair for (i64, i64) {type Out = Self; fn hpair(self) -> Self {self}}
+impl HPair for (isize, isize) {type Out = Self; fn hpair(self) -> Self {self}}
+
+impl<T> HPair for ([T; 2], [T; 2]) where (T, T): HPair {
+    type Out = [<(T, T) as HPair>::Out; 2];
+    fn hpair(self) -> Self::Out {
+        let ([a, b], [c, d]) = self;
+        [(a, c).hpair(), (b, d).hpair()]
+    }
+}
+
+impl<T> HPair for ([T; 3], [T; 3]) where (T, T): HPair {
+    type Out = [<(T, T) as HPair>::Out; 3];
+    fn hpair(self) -> Self::Out {
+        let ([a, b, c], [d, e, f]) = self;
+        [(a, d).hpair(), (b, e).hpair(), (c, f).hpair()]
+    }
+}
+
+impl<T> HPair for ([T; 4], [T; 4]) where (T, T): HPair {
+    type Out = [<(T, T) as HPair>::Out; 4];
+    fn hpair(self) -> Self::Out {
+        let ([a, b, c, d], [e, f, g, h]) = self;
+        [(a, e).hpair(), (b, f).hpair(), (c, g).hpair(), (d, h).hpair()]
+    }
+}
+
+impl<T> HPair for ([T; 5], [T; 5]) where (T, T): HPair {
+    type Out = [<(T, T) as HPair>::Out; 5];
+    fn hpair(self) -> Self::Out {
+        let ([a, b, c, d, e], [f, g, h, i, j]) = self;
+        [
+            (a, f).hpair(),
+            (b, g).hpair(),
+            (c, h).hpair(),
+            (d, i).hpair(),
+            (e, j).hpair()
+        ]
+    }
+}
+
+impl<T> HPair for ([T; 6], [T; 6]) where (T, T): HPair {
+    type Out = [<(T, T) as HPair>::Out; 6];
+    fn hpair(self) -> Self::Out {
+        let ([a, b, c, d, e, f], [g, h, i, j, k, l]) = self;
+        [
+            (a, g).hpair(),
+            (b, h).hpair(),
+            (c, i).hpair(),
+            (d, j).hpair(),
+            (e, k).hpair(),
+            (f, l).hpair()
+        ]
+    }
+}
+
+impl<T> HPair for (Vec<T>, Vec<T>) where (T, T): HPair {
+    type Out = Vec<<(T, T) as HPair>::Out>;
+    fn hpair(self) -> Self::Out {
+        let (a, b) = self;
+        a.into_iter().zip(b.into_iter()).map(|n| n.hpair()).collect()
+    }
+}
+
+/// Implemented by higher order maps.
+///
+/// A higher order map takes common data structures such as
+/// vectors and lists and applies a function to every element.
+///
+/// This is implemented recursively, hence higher order maps.
+pub trait HMap<Out> {
+    /// The out type.
+    type Fun;
+    /// Maps structure.
+    fn hmap(self, f: &Self::Fun) -> Out;
+}
+
+impl<T, U> HMap<U> for T
+where U: Call<T> {
+    type Fun = U::Fun;
+    fn hmap(self, f: &Self::Fun) -> U {
+        <U as Call<T>>::call(f, self)
+    }
+}
+
+impl<T, U> HMap<[U; 2]> for [T; 2]
+where T: HMap<U> {
+    type Fun = T::Fun;
+    fn hmap(self, f: &Self::Fun) -> [U; 2] {
+        let [a, b] = self;
+        [a.hmap(f), b.hmap(f)]
+    }
+}
+
+impl<T, U> HMap<[U; 3]> for [T; 3]
+where T: HMap<U> {
+    type Fun = T::Fun;
+    fn hmap(self, f: &Self::Fun) -> [U; 3] {
+        let [a, b, c] = self;
+        [a.hmap(f), b.hmap(f), c.hmap(f)]
+    }
+}
+
+impl<T, U> HMap<[U; 4]> for [T; 4]
+where T: HMap<U> {
+    type Fun = T::Fun;
+    fn hmap(self, f: &Self::Fun) -> [U; 4] {
+        let [a, b, c, d] = self;
+        [a.hmap(f), b.hmap(f), c.hmap(f), d.hmap(f)]
+    }
+}
+
+impl<T, U> HMap<[U; 5]> for [T; 5]
+where T: HMap<U> {
+    type Fun = T::Fun;
+    fn hmap(self, f: &Self::Fun) -> [U; 5] {
+        let [a, b, c, d, e] = self;
+        [a.hmap(f), b.hmap(f), c.hmap(f), d.hmap(f), e.hmap(f)]
+    }
+}
+
+impl<T, U> HMap<[U; 6]> for [T; 6]
+where T: HMap<U> {
+    type Fun = T::Fun;
+    fn hmap(self, fx: &Self::Fun) -> [U; 6] {
+        let [a, b, c, d, e, f] = self;
+        [a.hmap(fx), b.hmap(fx), c.hmap(fx), d.hmap(fx), e.hmap(fx), f.hmap(fx)]
+    }
+}
+
+impl<T, U> HMap<Vec<U>> for Vec<T>
+where T: HMap<U> {
+    type Fun = T::Fun;
+    fn hmap(self, f: &Self::Fun) -> Vec<U> {
+        self.into_iter().map(|n| n.hmap(f)).collect()
+    }
+}

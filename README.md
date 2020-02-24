@@ -165,3 +165,42 @@ The code for operators on higher order data structures must be written twice:
 
 - Once for the ordinary case `X<()>`
 - Once for the higher order case `X<Arg<T>>`
+
+### Higher Order Maps
+
+Sometimes it is useful to construct arbitrary data of the kind:
+
+- Vectors of primitives
+- Vectors of vectors, etc.
+
+For example, if a higher order point maps from angles to a circle,
+then complex geometry primitives might be defined onto the circle using angles:
+
+- Edge, e.g. `[a, b]`
+- Triangle, e.g. `[a, b, c]`
+- Square, e.g. `[[a, b], [c, d]]`
+
+The `HMap::hmap` method can be used to work with such structures.
+
+For example, if `p` is a higher order point of type `Point<Arg<f64>>`,
+then the following code maps two points at the same time:
+
+```ignore
+let q: [Point; 2] = [0.0, 1.0].hmap(&p);
+```
+
+For binary higher order maps of type `f : (T, T) -> U`,
+the `HPair::hpair` method can be used before using `HMap::hmap`.
+
+For example:
+
+```ignore
+let in_between: Func<f64, f64> = Arc::new(move |(a, b)| {
+    if b < a {b += 1.0};
+    (a + (b - a) * 0.5) % 1.0
+});
+// Pair up.
+let args: [(f64, f64); 2] = ([0.7, 0.9], [0.9, 0.1]).hpair();
+// `[0.8, 0.0]`
+let q: [f64; 2] = args.hmap(&in_between);
+```
